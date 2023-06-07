@@ -41,11 +41,10 @@ jobs:
           push: false
           tags: lhysin/local-cws-item-apiserver:latest
 
-      - name : docker list
-        run: docker image ls --all
-
-      - name: Save Docker image as tar
-        run: docker save lhysin/local-cws-item-apiserver:latest -o cws-item-apiserver.tar
+      - name: Save Docker Image as Tar
+        uses: docker/cli@v2
+        with:
+          args: save -o local-cws-item-apiserver.tar lhysin/local-cws-item-apiserver:latest
 
   deploy:
     needs: build
@@ -58,8 +57,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: cws-item-apiserver.tar
-          target: /images/cws-item-apiserver.tar
+          source: local-cws-item-apiserver.tar
+          target: /images/local-cws-item-apiserver.tar
     
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@master
@@ -68,7 +67,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker load -i /images/cws-item-apiserver.tar
+            docker load -i /images/local-cws-item-apiserver.tar
             docker stop cws-item-apiserver
             docker rm -f cws-item-apiserver
             docker run -d -p 9880:8880 --name cws-item-apiserver lhysin/local-cws-item-apiserver:latest
