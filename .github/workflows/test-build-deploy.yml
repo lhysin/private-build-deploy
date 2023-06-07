@@ -42,7 +42,7 @@ jobs:
           tags: lhysin/local-cws-item-apiserver:latest
 
       - name: Save Docker Image as Tar
-        uses: docker/cli@v2
+        uses: docker/cli@v1
         with:
           args: save -o local-cws-item-apiserver.tar lhysin/local-cws-item-apiserver:latest
 
