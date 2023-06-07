@@ -1,4 +1,4 @@
-name: build-and-deploy-private
+name: test-
 
 on:
   workflow_dispatch:
@@ -40,6 +40,9 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: false
           tags: lhysin/local-cws-item-apiserver:latest
+
+      - name : docker list
+        run: docker image ls --all
 
       - name: Save Docker image as tar
         run: docker save lhysin/local-cws-item-apiserver:latest -o cws-item-apiserver.tar
