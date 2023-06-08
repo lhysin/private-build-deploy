@@ -37,8 +37,8 @@ jobs:
         with:
           context: cws/item-apiserver # subdirectory
           file: cws/item-apiserver/Dockerfile
-          platforms: linux/amd64,linux/arm64
-#          platforms: linux/arm64
+#          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: false
           outputs: type=tar, dest=local-cws-item-apiserver.tar
           tags: lhysin/local-cws-item-apiserver:latest
