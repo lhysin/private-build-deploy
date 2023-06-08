@@ -54,7 +54,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           source: local-cws-item-apiserver.tar
-          target: /home/ubuntu/images
+          target: ~/images
     
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@master
@@ -63,8 +63,11 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker load -i /home/ubuntu/images/local-cws-item-apiserver.tar
+            cd ~/images
+            ls -lrt
+            docker load -i ~/images/local-cws-item-apiserver.tar
             docker stop cws-item-apiserver
             docker rm -f cws-item-apiserver
             docker run -d -p 9880:8880 --name cws-item-apiserver lhysin/local-cws-item-apiserver:latest
-            rm -rf /home/ubuntu/images
+            
+            #rm -rf ~/images
