@@ -5,6 +5,12 @@ on:
 
 permissions:
   contents: read
+  
+env:
+  SUB_DIRECTORY: cws/item-apiserver
+  DOCKER_NAMESPACE: lhysin
+  DOCKER_REPONAME: local-cws-item-apiserver
+  DOCKER_TAG: latest
 
 jobs:
   build:
@@ -24,7 +30,7 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew bootJar
-        working-directory: cws/item-apiserver
+        working-directory: $SUB_DIRECTORY
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -41,11 +47,11 @@ jobs:
       - name: Build Docker Image
         uses: docker/build-push-action@v2
         with:
-          context: cws/item-apiserver # subdirectory
-          file: cws/item-apiserver/Dockerfile
+          context: $SUB_DIRECTORY # subdirectory
+          file: $SUB_DIRECTORY/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: lhysin/local-cws-item-apiserver:latest
+          tags: $DOCKER_NAMESPACE/$DOCKER_REPONAME:$DOCKER_TAG
 
   deploy:
    needs: build
@@ -59,10 +65,10 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker stop local-cws-item-apiserver
-            docker image rm -f lhysin/local-cws-item-apiserver
-            docker pull lhysin/local-cws-item-apiserver:latest
-            docker run -d -p 0880:8880 --name local-cws-item-apiserver \
+            docker stop $DOCKER_REPONAME
+            docker image rm -f $DOCKER_NAMESPACE/$DOCKER_REPONAME
+            docker pull $DOCKER_NAMESPACE/$DOCKER_REPONAME:$DOCKER_TAG
+            docker run -d -p 0880:8880 --name $DOCKER_REPONAME \
             -e loki.push-server=${{ secrets.LOKI_PUSH_SERVER }} \
-            lhysin/local-cws-item-apiserver:latest
-            curl -X DELETE -u "${{ secrets.DOCKER_USERNAME }}:${{ secrets.DOCKER_PASSWORD }}" https://index.docker.io/v1/repositories/lhysin/local-cws-item-apiserver
+            $DOCKER_NAMESPACE/$DOCKER_REPONAME:$DOCKER_TAG
+            curl -X DELETE -u "${{ secrets.DOCKER_USERNAME }}:${{ secrets.DOCKER_PASSWORD }}" https://index.docker.io/v1/repositories/$DOCKER_NAMESPACE/$DOCKER_REPONAME
