@@ -54,7 +54,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           source: local-cws-item-apiserver.tar
-          target: /images/local-cws-item-apiserver.tar
+          target: /images
     
       - name: SSH into server and deploy
         uses: appleboy/ssh-action@master
