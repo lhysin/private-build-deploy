@@ -39,7 +39,7 @@ jobs:
           file: cws/item-apiserver/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: false
-          outputs: type=docker,dest=- . > local-cws-item-apiserver.tar
+          outputs: type=tar, dest=- . > local-cws-item-apiserver.tar
           tags: lhysin/local-cws-item-apiserver:latest
 
   deploy:
