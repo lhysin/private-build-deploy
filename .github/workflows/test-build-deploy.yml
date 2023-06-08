@@ -63,9 +63,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker buildx load -i ~/images/local-cws-item-apiserver.tar --platform linux/amd64,linux/arm64
+            docker load -i ~/images/local-cws-item-apiserver.tar
             docker stop local-cws-item-apiserver
             docker image rm -f lhysin/local-cws-item-apiserver
             docker rm -f local-cws-item-apiserver
             docker run -d -p 9880:8880 --name local-cws-item-apiserver lhysin/local-cws-item-apiserver:latest
-            rm -rf ~/images
+            #rm -rf ~/images
