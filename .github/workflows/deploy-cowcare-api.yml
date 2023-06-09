@@ -67,7 +67,7 @@ jobs:
             docker stop ${{ env.DOCKER_REPONAME }}
             docker image rm -f ${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}
             docker pull ${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}:${{ env.DOCKER_TAG }}
-            docker run -d -p 7880:7880 --name ${{ env.DOCKER_REPONAME }} --always \
+            docker run -d -p 7880:7880 --name ${{ env.DOCKER_REPONAME }} \
             -e SPRING_DATASOURCE_URL=${{ secrets.COWCARE_SPRING_DATASOURCE_URL }} \
             -e SPRING_DATASOURCE_USERNAME=${{ secrets.COWCARE_SPRING_DATASOURCE_USERNAME }} \
             -e SPRING_DATASOURCE_PASSWORD=${{ secrets.COWCARE_SPRING_DATASOURCE_PASSWORD }} \
