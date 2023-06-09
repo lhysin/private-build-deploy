@@ -9,7 +9,7 @@ permissions:
 env:
   SUB_DIRECTORY: Cowcare-front
   DOCKER_NAMESPACE: lhysin
-  DOCKER_REPONAME: cawcare-front
+  DOCKER_REPONAME: cowcare-front
   DOCKER_TAG: latest
 
 jobs:
