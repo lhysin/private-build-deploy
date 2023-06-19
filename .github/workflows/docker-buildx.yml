@@ -22,14 +22,6 @@ jobs:
       - name: Clone repository
         run: git clone 'https://github.com/Roverr/rtsp-stream'
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: ${{ env.SUB_DIRECTORY }}
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
