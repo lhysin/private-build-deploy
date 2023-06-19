@@ -26,15 +26,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.16
-          
-      - name: Install dep
-        run: |
-          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-        working-directory: ${{ env.SUB_DIRECTORY }}
-
-      - name: Restore dependencies
-        run: dep ensure
-        working-directory: ${{ env.SUB_DIRECTORY }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
