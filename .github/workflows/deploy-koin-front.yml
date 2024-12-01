@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Clone repository
+        run: git clone https://github.com/lhysin/koin
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
 
