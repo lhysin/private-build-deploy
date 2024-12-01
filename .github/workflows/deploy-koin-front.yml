@@ -10,13 +10,13 @@ env:
   SUB_DIRECTORY: koin
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Clone repository
+      - name: Clone koin repository
         run: git clone https://github.com/lhysin/koin
 
       - name: Setup Node.js
@@ -33,18 +33,18 @@ jobs:
           npm run build
           npm run generate
 
-  push-to-repo:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Clone target repository
+      - name: Clone target repository (lhysin.github.io)
         run: git clone https://github.com/lhysin/lhysin.github.io
+
+      - name: Print directory structure of target repo
+        run: |
+          echo "Directory structure of lhysin.github.io:"
+          tree -L 2  # Adjust L as needed
 
       - name: Delete old files and copy new build files
         run: |
-          cd lhysin.github.io
           rm -rf *  # 기존 모든 파일 삭제
-          cp -r ../${{ env.SUB_DIRECTORY }}/dist/* ./  # dist 폴더 내용 복사
+          cp -r ${{ env.SUB_DIRECTORY }}/dist/* ./  # dist 폴더 내용 복사
 
       - name: Commit and push changes
         run: |
