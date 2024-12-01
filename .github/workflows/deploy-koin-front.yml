@@ -50,6 +50,10 @@ jobs:
         run: |
           cp -r ${{ env.SUB_DIRECTORY }}/dist/* lhysin.github.io/
 
+      - name: Create .nojekyll file
+        run: |
+          touch .nojekyll  # .nojekyll 파일 생성
+
       - name: Commit and push changes
         run: |
           cd lhysin.github.io
