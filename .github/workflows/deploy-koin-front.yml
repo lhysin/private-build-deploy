@@ -69,4 +69,4 @@ jobs:
           # GitHub Actions 인증을 위한 토큰 설정
           git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/${{ env.TARGET_DIR }}.git
           
-          git push origin master  # 'master' 브랜치 사용
+          git push origin main  # 'main' 브랜치 사용
