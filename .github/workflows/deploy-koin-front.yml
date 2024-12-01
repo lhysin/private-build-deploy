@@ -44,7 +44,7 @@ jobs:
         run: |
           cd lhysin.github.io
           rm -rf *  # 기존 모든 파일 삭제
-          cp -r ../${{ env.SUB_DIRECTORY }}/dist/* .  # dist 폴더 내용 복사
+          cp -r ../${{ env.SUB_DIRECTORY }}/dist/* ./  # dist 폴더 내용 복사
 
       - name: Commit and push changes
         run: |
