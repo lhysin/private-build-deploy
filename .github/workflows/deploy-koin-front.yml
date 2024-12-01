@@ -1,4 +1,4 @@
-name: deploy-koin-front
+name: deploy-koin-front
 
 on:
   workflow_dispatch:
@@ -8,18 +8,16 @@ permissions:
 
 env:
   SUB_DIRECTORY: koin
+  BUILD_DIR: koin/.nuxt/dist  # Nuxt.js 빌드 디렉토리 (대부분 dist 폴더)
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Clone repository
-        run: git clone https://github.com/lhysin/koin
-
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
 
       - name: Install dependencies
@@ -40,7 +38,7 @@ jobs:
       - name: Checkout the target repository
         uses: actions/checkout@v3
         with:
-          repository: 'https://github.com/lhysin/lhysin.github.io'  # 여기에 푸시할 다른 레포지토리 주소를 추가
+          repository: 'https://github.com/lhysin/lhysin.github.io'
 
       - name: Copy build files to target directory
         run: |
@@ -52,4 +50,4 @@ jobs:
           git config --global user.email "actions@github.com"
           git add .
           git commit -m "Deploy static files"
-          git push origin master  # 기본 브랜치로 푸시
+          git push origin master  # 'master' 브랜치 사용
