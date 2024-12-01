@@ -52,6 +52,7 @@ jobs:
 
       - name: Create .nojekyll file
         run: |
+          cd lhysin.github.io
           touch .nojekyll  # .nojekyll 파일 생성
 
       - name: Commit and push changes
