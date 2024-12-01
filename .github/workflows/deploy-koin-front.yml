@@ -41,13 +41,18 @@ jobs:
           echo "Directory structure of lhysin.github.io:"
           tree -L 2  # Adjust L as needed
 
-      - name: Delete old files and copy new build files
+      - name: Delete all files in target repository
         run: |
-          rm -rf *  # 기존 모든 파일 삭제
-          cp -r ${{ env.SUB_DIRECTORY }}/dist/* ./  # dist 폴더 내용 복사
+          cd lhysin.github.io
+          rm -rf *  # 모든 파일 삭제
+
+      - name: Copy dist files to target repository
+        run: |
+          cp -r ${{ env.SUB_DIRECTORY }}/dist/* lhysin.github.io/
 
       - name: Commit and push changes
         run: |
+          cd lhysin.github.io
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add .
