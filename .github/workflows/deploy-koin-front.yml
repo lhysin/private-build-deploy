@@ -8,7 +8,6 @@ permissions:
 
 env:
   SUB_DIRECTORY: koin
-  BUILD_DIR: koin/.nuxt/dist  # Nuxt.js 빌드 디렉토리 (대부분 dist 폴더)
 
 jobs:
   build:
@@ -43,7 +42,7 @@ jobs:
 
       - name: Copy build files to target directory
         run: |
-          cp -r ${{ env.BUILD_DIR }}/* .
+          cp -r ${{ env.SUB_DIRECTORY }}/dist/* .
 
       - name: Commit and push changes
         run: |
