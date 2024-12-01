@@ -38,12 +38,12 @@ jobs:
 
       - name: Print directory structure of target repo
         run: |
-          echo "Directory structure of lhysin.github.io:"
+          echo "Directory structure of deploy-koin:"
           tree -L 2  # Adjust L as needed
 
       - name: Delete all files in target repository
         run: |
-          cd lhysin.github.io
+          cd deploy-koin
           rm -rf *  # 모든 파일 삭제
 
       - name: Copy dist files to target repository
