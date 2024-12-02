@@ -57,8 +57,17 @@ jobs:
       - name: Create .nojekyll file
         run: touch .nojekyll
 
+      - name: Show branch list before commit
+        run: |
+          cd ${{ env.SUB_DIRECTORY }}
+          echo "Listing local branches before commit:"
+          git branch  # 로컬 브랜치 목록 출력
+          echo "Listing remote branches:"
+          git branch -r  # 원격 브랜치 목록 출력
+
       - name: Commit and push changes to deploy-static-file branch
         run: |
+          cd ${{ env.SUB_DIRECTORY }}
           git config --global user.name "lhysin"
           git config --global user.email "lhysin.main@gmail.com"
           git add .
@@ -68,4 +77,5 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/koin.git
 
           # 브랜치 푸시
-          git push origin ${{ env.TARGET_BRANCH }} || git push -u origin ${{ env.TARGET_BRANCH }}
+          git push origin ${{ env.TARGET_BRANCH }} || git push -u origin ${{ env.TARGET_BRANCH }}  # 브랜치 푸시
+
