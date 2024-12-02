@@ -4,31 +4,30 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   SUB_DIRECTORY: koin
   SOURCE_REPO: https://github.com/lhysin/koin
-  TARGET_REPO: https://github.com/lhysin/deploy-koin.git
-  TARGET_DIR: deploy-koin
+  TARGET_BRANCH: deploy-static-file
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout source repository (main branch)
         uses: actions/checkout@v3
-
-      - name: Clone source repository
-        run: git clone ${{ env.SOURCE_REPO }}
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
 
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: ${{ env.SUB_DIRECTORY }}
+        run: |
+          cd ${{ env.SUB_DIRECTORY }}
+          npm install
 
       - name: Build Nuxt.js static files
         run: |
@@ -36,37 +35,34 @@ jobs:
           npm run build
           npm run generate
 
-      - name: Clone target repository
-        run: git clone ${{ env.TARGET_REPO }}
-
-      - name: Print directory structure of target repo
+      - name: Backup dist folder
         run: |
-          echo "Directory structure of ${{ env.TARGET_DIR }}:"
-          tree ${{ env.TARGET_DIR }} -L 2  # Adjust L as needed
+          mkdir -p ../dist-backup
+          cp -r ${{ env.SUB_DIRECTORY }}/dist/* ../dist-backup/
 
-      - name: Delete all files in target repository
+      - name: Checkout target branch (deploy-static-file)
         run: |
-          cd ${{ env.TARGET_DIR }}
-          rm -rf *  # 모든 파일 삭제
+          git checkout -b ${{ env.TARGET_BRANCH }} origin/${{ env.TARGET_BRANCH }} || git checkout -b ${{ env.TARGET_BRANCH }}
 
-      - name: Copy dist files to target repository
+      - name: Clear old files in target branch
         run: |
-          cp -r ${{ env.SUB_DIRECTORY }}/dist/* ${{ env.TARGET_DIR }}/
+          rm -rf *
+
+      - name: Restore dist folder
+        run: |
+          cp -r ../dist-backup/* ./
 
       - name: Create .nojekyll file
-        run: |
-          cd ${{ env.TARGET_DIR }}
-          touch .nojekyll  # .nojekyll 파일 생성
+        run: touch .nojekyll
 
-      - name: Commit and push changes
+      - name: Commit and push changes to deploy-static-file branch
         run: |
-          cd ${{ env.TARGET_DIR }}
           git config --global user.name "lhysin"
           git config --global user.email "lhysin.main@gmail.com"
           git add .
           git commit -m "Deploy static files"
           
           # GitHub Actions 인증을 위한 토큰 설정
-          git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/${{ env.TARGET_DIR }}.git
+          git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/koin.git
           
-          git push origin main  # 'main' 브랜치 사용
+          git push origin ${{ env.TARGET_BRANCH }}
