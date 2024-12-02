@@ -70,9 +70,12 @@ jobs:
           git config --global user.name "lhysin"
           git config --global user.email "lhysin.main@gmail.com"
           
-          echo "Pulling latest changes from remote repository..."
-          git pull origin ${{ env.TARGET_BRANCH }}  # 원격 저장소에서 변경사항을 가져옴
-
+          echo "Fetching latest changes from remote repository..."
+          git fetch origin  # 원격 저장소에서 모든 브랜치 가져오기
+      
+          echo "Checking out target branch (${{ env.TARGET_BRANCH }})..."
+          git checkout ${{ env.TARGET_BRANCH }} || git checkout -b ${{ env.TARGET_BRANCH }} origin/${{ env.TARGET_BRANCH }}  # 원격 브랜치가 없으면 로컬에서 새로 생성
+          
           echo "Staging and committing changes..."
           git add .
           git commit -m "Deploy static files" || echo "No changes to commit"
@@ -80,7 +83,7 @@ jobs:
           echo "Setting remote URL with GitHub token..."
           git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/koin.git
           echo "Remote URL set."
-
+      
           echo "Pushing changes to branch ${{ env.TARGET_BRANCH }}..."
           git push origin ${{ env.TARGET_BRANCH }}  # 브랜치 푸시
           echo "Changes pushed to ${{ env.TARGET_BRANCH }}."
