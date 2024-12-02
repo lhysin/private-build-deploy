@@ -74,7 +74,7 @@ jobs:
           git commit -m "Deploy static files" || echo "No changes to commit"
           
           # GitHub Actions 인증을 위한 토큰 설정
-          git remote set-url origin https://${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/koin.git
+          git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/koin.git
       
           # 푸시할 브랜치로 설정 (예: TARGET_BRANCH 환경 변수를 사용)
           git push origin ${{ env.TARGET_BRANCH }}  # 브랜치 푸시
