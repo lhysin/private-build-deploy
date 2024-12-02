@@ -65,14 +65,18 @@ jobs:
 
       - name: Commit and push changes to deploy-static-file branch
         run: |
+          # Git 사용자 설정
           git config --global user.name "lhysin"
           git config --global user.email "lhysin.main@gmail.com"
+          
+          # 변경 사항 스테이징 및 커밋
           git add .
-          git commit -m "Deploy static files"
+          git commit -m "Deploy static files" || echo "No changes to commit"
           
           # GitHub Actions 인증을 위한 토큰 설정
           git remote set-url origin https://lhysin:${{ secrets.LHYSIN_ALL_REPO_NO_EXPIARY_FINE_TOKEN }}@github.com/lhysin/koin.git
+      
+          # 푸시할 브랜치로 설정 (예: TARGET_BRANCH 환경 변수를 사용)
+          git push origin ${{ env.TARGET_BRANCH }}  # 브랜치 푸시
 
-          # 브랜치 푸시
-          git push -u origin ${{ env.TARGET_BRANCH }}  # 브랜치 푸시
 
