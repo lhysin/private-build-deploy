@@ -6,62 +6,39 @@ on:
 permissions:
   contents: write
 
-env:
-  SUB_DIRECTORY: koin
-  SOURCE_REPO: https://github.com/lhysin/koin
-  TARGET_BRANCH: deploy-static-file
-
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. private-build-deploy 레포지토리에서 액션 실행
-    - name: Checkout private-build-deploy repo
-      uses: actions/checkout@v3
+      - name: Checkout koin repository
+        uses: actions/checkout@v2
+        with:
+          repository: lhysin/koin
+          ref: main
 
-    # 2. koin 레포지토리의 main 브랜치 체크아웃
-    - name: Checkout koin repo
-      uses: actions/checkout@v3
-      with:
-        repository: lhysin/koin
-        ref: main
-        path: koin
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # 원하는 Node.js 버전으로 변경 가능
 
-    # 3. koin 레포지토리로 이동
-    - name: Change to koin directory
-      run: cd koin
+      - name: Install dependencies
+        run: npm install
 
-    # 4. koin 레포지토리에서 npm install
-    - name: Install dependencies
-      run: |
-        cd koin
-        npm install
+      - name: Build Nuxt
+        run: npm run build
 
-    # 5. nuxt 빌드
-    - name: Build Nuxt app
-      run: |
-        cd koin
-        npm run build
+      - name: Prepare static files for deployment
+        run: |
+          mkdir -p ./deploy  # deploy 폴더 생성
+          cp -R ./dist/* ./deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
+          git checkout -b deploy-static-file || git checkout deploy-static-file
 
-    # 6. deploy-static-file 브랜치 체크아웃
-    - name: Checkout deploy-static-file branch
-      run: |
-        cd koin
-        git checkout deploy-static-file
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add .
+          git commit -m "Deploy static files" || echo "No changes to commit"
+          git push --force origin deploy-static-file
 
-    # 7. 빌드된 dist 폴더를 deploy-static-file 브랜치에 복사
-    - name: Copy dist files to deploy-static-file branch
-      run: |
-        cd koin
-        cp -r dist/* .
-
-    # 8. 커밋하고 푸시
-    - name: Commit and push changes
-      run: |
-        cd koin
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add .
-        git commit -m "Deploy Nuxt static files"
-        git push origin deploy-static-file
