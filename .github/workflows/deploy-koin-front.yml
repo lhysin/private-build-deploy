@@ -15,11 +15,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source repository (main branch)
+      - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          repository: ${{ env.SOURCE_REPO }}
-          ref: main
+
+      - name: Clone source repository
+        run: git clone ${{ env.SOURCE_REPO }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
