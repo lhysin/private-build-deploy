@@ -5,7 +5,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 env:
   SUB_DIRECTORY: koin
@@ -15,78 +14,58 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    # 1. private-build-deploy 레포지토리에서 액션 실행
+    - name: Checkout private-build-deploy repo
+      uses: actions/checkout@v3
 
-      - name: Clone source repository
-        run: git clone ${{ env.SOURCE_REPO }}
+    # 2. koin 레포지토리의 main 브랜치 체크아웃
+    - name: Checkout koin repo
+      uses: actions/checkout@v3
+      with:
+        repository: lhysin/koin
+        ref: main
+        path: koin
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+    # 3. koin 레포지토리로 이동
+    - name: Change to koin directory
+      run: cd koin
 
-      - name: Install dependencies
-        run: |
-          cd ${{ env.SUB_DIRECTORY }}
-          npm install
+    # 4. koin 레포지토리에서 npm install
+    - name: Install dependencies
+      run: |
+        cd koin
+        npm install
 
-      - name: Build Nuxt.js static files
-        run: |
-          cd ${{ env.SUB_DIRECTORY }}
-          npm run build
-          npm run generate
+    # 5. nuxt 빌드
+    - name: Build Nuxt app
+      run: |
+        cd koin
+        npm run build
 
-      - name: Backup dist folder
-        run: |
-          mkdir -p ../dist-backup
-          cp -r ${{ env.SUB_DIRECTORY }}/dist/* ../dist-backup/
+    # 6. dist 폴더 백업
+    - name: Backup dist folder
+      run: |
+        mv koin/dist koin/dist-backup
 
-      - name: Checkout target branch (deploy-static-file)
-        run: |
-          git fetch --all  # 원격 저장소 정보 최신화
-          git checkout ${{ env.TARGET_BRANCH }} || git checkout -b ${{ env.TARGET_BRANCH }}  # 원격 브랜치가 없으면 로컬 브랜치 생성
+    # 7. deploy-static-file 브랜치 체크아웃
+    - name: Checkout deploy-static-file branch
+      run: |
+        cd koin
+        git checkout deploy-static-file
 
-      - name: Clear old files in target branch
-        run: |
-          rm -rf *
+    # 8. 백업한 dist 파일을 deploy-static-file 브랜치에 복사
+    - name: Copy dist files to deploy-static-file branch
+      run: |
+        cp -r koin/dist-backup/* koin/
 
-      - name: Restore dist folder
-        run: |
-          cp -r ../dist-backup/* ./
-
-      - name: Create .nojekyll file
-        run: touch .nojekyll
-
-      - name: Show branch list before commit
-        run: |
-          echo "Listing local branches before commit:"
-          git branch  # 로컬 브랜치 목록 출력
-          echo "Listing remote branches:"
-          git branch -r  # 원격 브랜치 목록 출력
-
-      - name: Commit and push changes to deploy-static-file branch
-        run: |
-          echo "Setting Git user configuration..."
-          git config --global user.name "lhysin"
-          git config --global user.email "lhysin.main@gmail.com"
-          
-          echo "Fetching latest changes from remote repository..."
-          git fetch origin  # 원격 저장소에서 모든 브랜치 가져오기
-      
-          echo "Checking out target branch (${{ env.TARGET_BRANCH }})..."
-          git checkout ${{ env.TARGET_BRANCH }} || git checkout -b ${{ env.TARGET_BRANCH }} origin/${{ env.TARGET_BRANCH }}  # 원격 브랜치가 없으면 로컬에서 새로 생성
-          
-          echo "Staging and committing changes..."
-          git add .
-          git commit -m "Deploy static files" || echo "No changes to commit"
-          
-          echo "Setting remote URL with GitHub token..."
-          git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/koin.git
-          echo "Remote URL set."
-      
-          echo "Pushing changes to branch ${{ env.TARGET_BRANCH }}..."
-          git push origin ${{ env.TARGET_BRANCH }}  # 브랜치 푸시
-          echo "Changes pushed to ${{ env.TARGET_BRANCH }}."
-
-
-
+    # 9. 커밋하고 푸시
+    - name: Commit and push changes
+      run: |
+        cd koin
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add .
+        git commit -m "Deploy Nuxt static files"
+        git push origin deploy-static-file
