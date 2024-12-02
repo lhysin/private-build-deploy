@@ -1,53 +1,52 @@
 name: deploy-koin-front
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 수동으로 워크플로우 실행 가능
 
 permissions:
-  contents: write
+  contents: write  # GitHub에서 저장소 콘텐츠를 수정할 권한 설정
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 이 작업은 최신 버전의 우분투에서 실행됨
 
     steps:
       - name: Checkout koin repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2  # koin 레포지토리를 체크아웃
         with:
-          repository: lhysin/koin
-          ref: main
-          token: ${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}
+          repository: lhysin/koin  # 사용할 레포지토리 설정
+          ref: main  # main 브랜치를 체크아웃
+          token: ${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}  # 개인 토큰 사용
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3  # Node.js 환경을 설정
 
-      # 3. koin 레포지토리에서 npm install
+      # 3. koin 레포지토리에서 npm install을 통해 의존성 설치
       - name: Install dependencies in koin repo
         run: |
-          npm install
-          npm run generate
+          npm install  # npm 의존성 설치
+          npm run generate  # 필요한 추가 빌드 작업 실행
 
       - name: folder
         run: |
-          ls --all
+          ls --all  # 현재 디렉토리 내 모든 파일과 폴더 출력 (디버깅용)
 
       - name: Prepare static files for deployment
         run: |
-          mkdir -p ../deploy  # deploy 폴더 생성
-          cp -R ./dist/* ../deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
-          git checkout deploy-static-file || git checkout -b deploy-static-file
-          rm -rf ./*
-          cp -r ../deploy/* ./
-          
+          mkdir -p ../deploy  # 배포할 파일들을 저장할 deploy 폴더 생성
+          cp -R ./dist/* ../deploy/  # dist 폴더의 모든 내용을 deploy 폴더로 복사
+          git checkout deploy-static-file || git checkout -b deploy-static-file  # deploy-static-file 브랜치 체크아웃, 없으면 새로 생성
+          rm -rf ./  # 현재 디렉토리의 모든 파일 삭제
+          cp -r ../deploy/* ./  # deploy 폴더의 파일을 현재 디렉토리로 복사
+
       - name: folder
         run: |
-          ls --all
-          
+          ls --all  # 현재 디렉토리 내 모든 파일과 폴더 출력 (디버깅용)
+
       - name: Commit and push changes
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git add .
-          git commit -m "Deploy static files" || echo "No changes to commit"
-          git push --force origin deploy-static-file
-
+          git config --global user.name "GitHub Action"  # GitHub Action 이름 설정
+          git config --global user.email "action@github.com"  # GitHub Action 이메일 설정
+          git add .  # 변경된 모든 파일을 스테이지에 추가
+          git commit -m "[$(date +'%Y-%m-%d')] Deploy static files" || echo "No changes to commit"  # 변경 사항 커밋, 변경 없으면 메시지 출력
+          git push --force origin deploy-static-file  # 강제로 변경 사항을 deploy-static-file 브랜치에 푸시
