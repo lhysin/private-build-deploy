@@ -18,24 +18,25 @@ jobs:
           ref: main
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'  # 원하는 Node.js 버전으로 변경 가능
+        uses: actions/setup-node@v3
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Nuxt
-        run: npm run build
+      # 3. koin 레포지토리에서 npm install
+      - name: Install dependencies in koin repo
+        run: |
+          cd koin
+          npm install
+          npm run build
 
       - name: Prepare static files for deployment
         run: |
           mkdir -p ./deploy  # deploy 폴더 생성
-          cp -R ./dist/* ./deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
+          cp -R .koin/dist/* ./deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
+          cd koin
           git checkout -b deploy-static-file || git checkout deploy-static-file
 
       - name: Commit and push changes
         run: |
+          cd koin
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add .
