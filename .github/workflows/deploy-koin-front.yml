@@ -32,9 +32,11 @@ jobs:
 
       - name: Prepare static files for deployment
         run: |
-          mkdir -p ./deploy  # deploy 폴더 생성
-          cp -R ./dist/* ./deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
-          git checkout -b deploy-static-file || git checkout deploy-static-file
+          mkdir -p ../deploy  # deploy 폴더 생성
+          cp -R ./dist/* ../deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
+          git checkout deploy-static-file || git checkout -b deploy-static-file
+          rm -rf .
+          cp -R . ../deploy/*
           
       - name: folder
         run: |
