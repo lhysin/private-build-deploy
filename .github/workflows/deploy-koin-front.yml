@@ -44,23 +44,19 @@ jobs:
         cd koin
         npm run build
 
-    # 6. dist 폴더 백업
-    - name: Backup dist folder
-      run: |
-        mv koin/dist koin/dist-backup
-
-    # 7. deploy-static-file 브랜치 체크아웃
+    # 6. deploy-static-file 브랜치 체크아웃
     - name: Checkout deploy-static-file branch
       run: |
         cd koin
         git checkout deploy-static-file
 
-    # 8. 백업한 dist 파일을 deploy-static-file 브랜치에 복사
+    # 7. 빌드된 dist 폴더를 deploy-static-file 브랜치에 복사
     - name: Copy dist files to deploy-static-file branch
       run: |
-        cp -r koin/dist-backup/* koin/
+        cd koin
+        cp -r dist/* .
 
-    # 9. 커밋하고 푸시
+    # 8. 커밋하고 푸시
     - name: Commit and push changes
       run: |
         cd koin
