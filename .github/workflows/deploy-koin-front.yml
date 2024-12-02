@@ -42,7 +42,6 @@ jobs:
 
       - name: Checkout target branch (deploy-static-file)
         run: |
-          cd ${{ env.SUB_DIRECTORY }}
           git fetch --all  # 원격 저장소 정보 최신화
           git checkout ${{ env.TARGET_BRANCH }} || git checkout -b ${{ env.TARGET_BRANCH }}  # 원격 브랜치가 없으면 로컬 브랜치 생성
 
