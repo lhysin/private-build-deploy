@@ -42,23 +42,28 @@ jobs:
 
       - name: Checkout target branch (deploy-static-file)
         run: |
-          cd ${{ env.SUB_DIRECTORY }}
+          cd koin  # 기존 저장소로 이동
           git fetch --all  # 원격 저장소 정보 최신화
           git checkout ${{ env.TARGET_BRANCH }} || git checkout -b ${{ env.TARGET_BRANCH }}  # 원격 브랜치가 없으면 로컬 브랜치 생성
 
       - name: Clear old files in target branch
         run: |
+          cd koin  # 대상 디렉토리로 이동
           rm -rf *
 
       - name: Restore dist folder
         run: |
+          cd koin  # 대상 디렉토리로 이동
           cp -r ../dist-backup/* ./
 
       - name: Create .nojekyll file
-        run: touch .nojekyll
+        run: |
+          cd koin  # 대상 디렉토리로 이동
+          touch .nojekyll
 
       - name: Commit and push changes to deploy-static-file branch
         run: |
+          cd koin  # 대상 디렉토리로 이동
           git config --global user.name "lhysin"
           git config --global user.email "lhysin.main@gmail.com"
           git add .
@@ -67,4 +72,5 @@ jobs:
           # GitHub Actions 인증을 위한 토큰 설정
           git remote set-url origin https://x-access-token:${{ secrets.LHYSIN_UN_EXPIARY_GITHUB_TOKEN }}@github.com/lhysin/koin.git
           
-          git push origin ${{ env.TARGET_BRANCH }}
+          # 브랜치 푸시
+          git push origin ${{ env.TARGET_BRANCH }} || git push -u origin ${{ env.TARGET_BRANCH }}
