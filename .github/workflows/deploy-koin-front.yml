@@ -36,7 +36,7 @@ jobs:
           cp -R ./dist/* ../deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
           git checkout deploy-static-file || git checkout -b deploy-static-file
           rm -rf ./*
-          cp -R . ../deploy/*
+          cp -r ../deploy/* ./
           
       - name: folder
         run: |
