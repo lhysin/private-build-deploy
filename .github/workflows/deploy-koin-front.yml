@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies in koin repo
         run: |
           npm install
-          npm run build
+          npm run generate
 
       - name: folder
         run: |
