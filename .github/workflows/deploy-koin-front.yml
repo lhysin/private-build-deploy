@@ -33,7 +33,7 @@ jobs:
       - name: Prepare static files for deployment
         run: |
           mkdir -p ./deploy  # deploy 폴더 생성
-          cp -R .koin/dist/* ./deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
+          cp -R ./dist/* ./deploy/  # dist 폴더의 내용을 deploy 폴더로 복사
           git checkout -b deploy-static-file || git checkout deploy-static-file
           
       - name: folder
