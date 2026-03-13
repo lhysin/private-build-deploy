@@ -24,7 +24,7 @@ jobs:
           repository_url: https://github.com/dooqod/world-smallest-docker-image.git
           docker_context: ./world-smallest-docker-image
           dockerfile: ./world-smallest-docker-image/Dockerfile
-          image_tag: ${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}:${{ env.DOCKER_TAG }}
+          image_tag: ${{ secrets.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}:${{ env.DOCKER_TAG }}
           docker_registry: ${{ secrets.DOCKER_REGISTRY }}
           docker_username: ${{ secrets.DOCKER_USERNAME }}
           docker_password: ${{ secrets.DOCKER_PASSWORD }}
