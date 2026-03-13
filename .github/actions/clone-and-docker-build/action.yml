@@ -11,12 +11,18 @@ inputs:
   dockerfile:
     description: Dockerfile path
     required: true
-  image_tag:
-    description: Docker image tag to push
+  docker_namespace:
+    description: Container registry namespace or project
+    required: true
+  docker_reponame:
+    description: Container image repository name
+    required: true
+  docker_tag:
+    description: Container image tag
     required: true
   docker_registry:
     description: Container registry URL
-    required: false
+    required: true
   docker_username:
     description: Container registry username
     required: true
@@ -51,4 +57,4 @@ runs:
         file: ${{ inputs.dockerfile }}
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ${{ inputs.image_tag }}
+        tags: ${{ inputs.docker_registry }}/${{ inputs.docker_namespace }}/${{ inputs.docker_reponame }}:${{ inputs.docker_tag }}

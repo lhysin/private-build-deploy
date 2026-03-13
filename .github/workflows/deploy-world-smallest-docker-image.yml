@@ -7,6 +7,7 @@ permissions:
   contents: read
 
 env:
+  DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
   DOCKER_NAMESPACE: lhysin
   DOCKER_REPONAME: world-smallest-docker-image
   DOCKER_TAG: latest
@@ -24,7 +25,9 @@ jobs:
           repository_url: https://github.com/dooqod/world-smallest-docker-image.git
           docker_context: ./world-smallest-docker-image
           dockerfile: ./world-smallest-docker-image/Dockerfile
-          image_tag: ${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}:${{ env.DOCKER_TAG }}
-          docker_registry: ${{ secrets.DOCKER_REGISTRY }}
+          docker_registry: ${{ env.DOCKER_REGISTRY }}
+          docker_namespace: ${{ env.DOCKER_NAMESPACE }}
+          docker_reponame: ${{ env.DOCKER_REPONAME }}
+          docker_tag: ${{ env.DOCKER_TAG }}
           docker_username: ${{ secrets.DOCKER_USERNAME }}
           docker_password: ${{ secrets.DOCKER_PASSWORD }}
