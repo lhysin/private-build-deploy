@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 env:
-  DOCKER_NAMESPACE: lhysin
+  DOCKER_NAMESPACE: lhysin/test
   DOCKER_REPONAME: docker-alpine-python3
   DOCKER_TAG: latest
 
