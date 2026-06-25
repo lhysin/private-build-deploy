@@ -7,8 +7,8 @@ permissions:
   contents: read
 
 env:
-  DOCKER_NAMESPACE: lhysin
-  DOCKER_REPONAME: private-docker
+  DOCKER_NAMESPACE: lhysin/private-docker
+  DOCKER_REPONAME: world-smallest-docker-image
   DOCKER_TAG: latest
 
 jobs:
