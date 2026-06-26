@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 env:
-  DOCKER_NAMESPACE: lhysin
+  DOCKER_NAMESPACE: lhysin-docker/private
   DOCKER_REPONAME: inkly
   DOCKER_TAG: latest
   TARGET_REPOSITORY: lhysin/inkly
