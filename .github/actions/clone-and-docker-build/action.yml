@@ -1,10 +1,14 @@
 name: clone-and-docker-build
-description: Clone a repository and build a Docker image
+description: Clone a repository (public or private) and build a Docker image
 
 inputs:
   repository_url:
     description: Repository URL to clone
     required: true
+  repository_token:
+    description: Optional token for cloning a private repository. Falls back to GITHUB_TOKEN when empty.
+    required: false
+    default: ""
   docker_context:
     description: Docker build context path
     required: true
@@ -29,7 +33,27 @@ runs:
   steps:
     - name: Clone target repository
       shell: bash
-      run: git clone "${{ inputs.repository_url }}"
+      env:
+        REPO_URL: ${{ inputs.repository_url }}
+        REPO_TOKEN: ${{ inputs.repository_token }}
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        # Pick the first non-empty token: explicit input > GITHUB_TOKEN
+        TOKEN=""
+        if [ -n "$REPO_TOKEN" ]; then
+          TOKEN="$REPO_TOKEN"
+        elif [ -n "$GH_TOKEN" ]; then
+          TOKEN="x-access-token:${GH_TOKEN}"
+        fi
+
+        if [ -n "$TOKEN" ]; then
+          # Inject token into https URL: https://<token>@github.com/owner/repo.git
+          AUTHED_URL=$(echo "$REPO_URL" | sed -E "s#https://#https://${TOKEN}@#")
+          git clone "$AUTHED_URL"
+        else
+          # Public repository
+          git clone "$REPO_URL"
+        fi
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v4

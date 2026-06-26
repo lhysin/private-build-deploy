@@ -1,0 +1,84 @@
+name: gradle-build
+description: Build a Spring Boot (or any Gradle) project with cached dependencies and build outputs
+
+inputs:
+  working_directory:
+    description: Project root containing gradlew
+    required: false
+    default: "."
+  gradle_task:
+    description: Gradle task to run (e.g. "bootJar", "build", "test")
+    required: false
+    default: "bootJar"
+  java_version:
+    description: JDK version to use
+    required: false
+    default: "25"
+  distribution:
+    description: JDK distribution (temurin, zulu, corretto, etc.)
+    required: false
+    default: "temurin"
+  extra_args:
+    description: Extra arguments to pass to gradlew (e.g. "-x test")
+    required: false
+    default: ""
+  build_output:
+    description: Glob (relative to working_directory) for built artifacts to expose in outputs
+    required: false
+    default: "build/libs/*.jar"
+  gradle_home_cache_cleanup:
+    description: Auto-prune Gradle cache at end of job
+    required: false
+    default: "true"
+
+outputs:
+  artifact_paths:
+    description: Newline-separated list of built artifact paths
+    value: ${{ steps.collect.outputs.paths }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@v5
+      with:
+        java-version: ${{ inputs.java_version }}
+        distribution: ${{ inputs.distribution }}
+
+    - name: Set up Gradle (cached, restored across runs)
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        gradle-home-cache-cleanup: ${{ inputs.gradle_home_cache_cleanup }}
+        cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+    - name: Make gradlew executable
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: chmod +x ./gradlew
+
+    - name: Run Gradle task
+      id: build
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.caching=true"
+      run: ./gradlew ${{ inputs.gradle_task }} ${{ inputs.extra_args }} --no-daemon --build-cache
+
+    - name: Collect build artifacts
+      id: collect
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        # shellcheck disable=SC2207
+        PATHS=$(ls -1 ${{ inputs.build_output }} 2>/dev/null || true)
+        if [ -z "$PATHS" ]; then
+          echo "::warning::No artifacts matched '${{ inputs.build_output }}'"
+        else
+          echo "Built artifacts:"
+          echo "$PATHS" | sed 's/^/  - /'
+        fi
+        {
+          echo "paths<<EOF"
+          echo "$PATHS"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"

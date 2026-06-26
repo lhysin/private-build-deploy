@@ -1,0 +1,59 @@
+name: deploy-inkly-docker-image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOCKER_NAMESPACE: lhysin
+  DOCKER_REPONAME: inkly
+  DOCKER_TAG: latest
+  TARGET_REPOSITORY: lhysin/inkly
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v7
+
+      - name: Checkout target repository
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ env.TARGET_REPOSITORY }}
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: inkly
+
+      - name: Build jar
+        uses: ./.github/actions/gradle-build
+        with:
+          working_directory: inkly
+          gradle_task: clean bootJar
+          extra_args: -x test
+          build_output: build/libs/app.jar
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to container registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./inkly
+          file: ./inkly/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}:${{ env.DOCKER_TAG }}
+            ${{ secrets.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${{ env.DOCKER_REPONAME }}:build-${{ github.run_number }}
